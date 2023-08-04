@@ -196,7 +196,7 @@ for _, receta in dataframe.iterrows():
                 print(f'Receta "{receta_data["Titulo"]}" enviada exitosamente a la API.')
                 existing_recetas.append(receta_data["Titulo"])  # Agregar el título a la lista de enviados
             else:
-                print(f'Error al enviar la receta "{receta_data["Titulo"]}" a la API.')
+                print(f'Error al enviar la receta "{receta_data["Titulo"]}" a la API. Para mas informacion puedes consultar en "{receta_data["url"]}')
                 print(response.text)
         else:
-            print(f'Error: Los campos "Ingredientes" y "Preparacion" no pueden estar vacíos para la receta "{receta_data["Titulo"]}".')
+            print(f'Error: Los campos "Ingredientes" y "Preparacion" no pueden estar vacíos para la receta "{receta_data["Titulo"]}". Para mas informacion puedes consultar en "{receta_data["url"]}')
