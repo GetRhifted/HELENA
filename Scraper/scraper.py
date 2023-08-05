@@ -1,8 +1,9 @@
+import json
+from datetime import datetime
+
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
-from datetime import datetime
-import json
 
 # Variables de trabajo.
 
@@ -15,7 +16,7 @@ direct_palad = requests.get(url)
 # Volvemos una soup nuestra variable encapsulada.
 s_palad = BeautifulSoup(direct_palad.text, 'lxml')
 
-# Ubicamos las secciones dentro de la pagina we.
+# Ubicamos las secciones dentro de la pagina web.
 secciones = s_palad.find('nav', attrs={'class':'head-primary'}).find_all('li')
 
 # Dividimos las secciones en secciones individuales y seleccionamos la que queremos trabajar.
