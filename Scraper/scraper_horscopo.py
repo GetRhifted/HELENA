@@ -114,13 +114,13 @@ for i, link in enumerate(links_secciones):
             print('No se pudo obtener la seccion', link)
 
 # Script haciendo uso de Pandas.
-data = []
+data_horos = []
 
 enlace_final = 'https://www.hola.com/horoscopo/piscis/'
 
 for i, prediccion in enumerate(predicciones):
     print(f'Scrapeando la nota {i}/{len(predicciones)}')
-    data.append(scrape_prediccion('https://www.hola.com' + prediccion))
+    data_horos.append(scrape_prediccion('https://www.hola.com' + prediccion))
 
     # Detener el bucle si se alcanza el enlace final
     if 'https://www.hola.com' + prediccion == enlace_final:
@@ -128,8 +128,48 @@ for i, prediccion in enumerate(predicciones):
 
 
 # Variable de Pandas.
-dataframe = pd.DataFrame(data)
+dataframe = pd.DataFrame(data_horos)
 dataframe.to_excel('predicciones.xlsx', index=False, engine='xlsxwriter')
+
+# Logica de vinculacion con la API.
+
+# URL de la API para enviar los datos
+api_url = 'http://127.0.0.1:8000/api/Predicciones/'  # Reemplaza esto con la URL de tu API
+
+# Realizar la solicitud GET a la API para obtener la lista de títulos ya enviados
+response = requests.get(api_url)
+existing_predicciones = []
+
+if response.status_code == 200:
+    existing_predicciones = [prediccion['Titulo'] for prediccion in response.json()]
+
+# Realizar la solicitud POST a la API
+headers = {'Content-Type': 'application/json'}
+
+for _, prediccion in dataframe.iterrows():
+    prediccion_data = {
+        "Titulo": prediccion["Titulo"][:100],  # Limitar el título a 100 caracteres
+        "Prediccion": prediccion["Prediccion"],
+        "url": prediccion["url"]
+    }
+
+    # Verificar si el título de la receta ya existe en la lista de enviados
+    if prediccion_data["Titulo"] in existing_predicciones:
+        print(f'Prediccion "{prediccion_data["Titulo"]}" ya existe en la API. No se enviará nuevamente.')
+    else:
+        # Verificar que los campos "Ingredientes" y "Preparacion" no estén vacíos
+        if pd.notna(prediccion_data["Prediccion"]):
+            response = requests.post(api_url, json=prediccion_data, headers=headers)
+
+            # Verificar si la solicitud fue exitosa para cada receta individual
+            if response.status_code == 201:
+                print(f'Prediccion "{prediccion_data["Titulo"]}" ha sido enviada exitosamente a la API.')
+                existing_predicciones.append(prediccion_data["Titulo"])  # Agregar el título a la lista de enviados
+            else:
+                print(f'Error al enviar la prediccion "{prediccion_data["Titulo"]}" a la API. Para mas informacion puedes consultar en "{prediccion_data["url"]}')
+                print(response.text)
+        else:
+            print(f'Error: El campo "Prediccion" no puede estar vacío para la prediccion "{prediccion_data["Titulo"]}". Para mas informacion puedes consultar en "{prediccion_data["url"]}')
         
 
 

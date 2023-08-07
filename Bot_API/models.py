@@ -7,3 +7,8 @@ class Recetas(models.Model):
     Ingredientes = models.TextField()
     Preparacion = models.TextField()
     url = models.URLField(null=True, blank=True)
+
+class Predicciones(models.Model):
+    Titulo = models.CharField(max_length=200)
+    Prediccion = models.TextField()
+    url = models.URLField(null=True, blank=True)
