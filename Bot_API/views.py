@@ -1,7 +1,10 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import RecetasSerializer, PrediccionesSerializer
+
+
+from .serializers import PrediccionesSerializer, RecetasSerializer
+
 
 @api_view(['POST'])
 def guardar_recetas(request):
@@ -36,3 +39,4 @@ def guardar_predicciones(request):
         else:
             print("Errores de validación:", serializer.errors)
             return Response(serializer.errors, status=400)
+

@@ -4,7 +4,7 @@ import json
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from html import unescape
+from unidecode import unidecode
 
 # Variables de trabajo.
 
@@ -39,6 +39,9 @@ lista_signos = s_linkhoroscopos.find('section', attrs={'class':'col-xs-12 col-md
 # Tomo los links de esa lista.
 links_signos = ['https://www.hola.com' + signo.get('href') for signo in lista_signos]
 
+# Script para correcion de formato en tildes.
+def normalize_text(text):
+    return unidecode(text).strip()
 
 # Scripts de Trabajo.
 try:
@@ -47,13 +50,13 @@ try:
 
         Titulo = s_horos.find('h1', attrs={'id': 'titprev'})
         if Titulo:
-            horos_dict['Titulo'] = Titulo.text
+            horos_dict['Titulo'] = normalize_text(Titulo.text)
         else:
             horos_dict['Titulo'] = None
 
         Prediccion = s_horos.find('div', attrs={'id': 'resultados'})
         if Prediccion:
-            horos_dict['Prediccion'] = Prediccion.text
+            horos_dict['Prediccion'] = normalize_text(Prediccion.text)
         else:
             horos_dict['Prediccion'] = None
         
@@ -141,7 +144,7 @@ response = requests.get(api_url)
 existing_predicciones = []
 
 if response.status_code == 200:
-    existing_predicciones = [prediccion['Titulo'] for prediccion in response.json()]
+    existing_predicciones = [prediccion['Prediccion'] for prediccion in response.json()]
 
 # Realizar la solicitud POST a la API
 headers = {'Content-Type': 'application/json'}
@@ -154,7 +157,7 @@ for _, prediccion in dataframe.iterrows():
     }
 
     # Verificar si el título de la receta ya existe en la lista de enviados
-    if prediccion_data["Titulo"] in existing_predicciones:
+    if prediccion_data["Prediccion"] in existing_predicciones:
         print(f'Prediccion "{prediccion_data["Titulo"]}" ya existe en la API. No se enviará nuevamente.')
     else:
         # Verificar que los campos "Ingredientes" y "Preparacion" no estén vacíos
@@ -170,6 +173,8 @@ for _, prediccion in dataframe.iterrows():
                 print(response.text)
         else:
             print(f'Error: El campo "Prediccion" no puede estar vacío para la prediccion "{prediccion_data["Titulo"]}". Para mas informacion puedes consultar en "{prediccion_data["url"]}')
+
+
         
 
 
