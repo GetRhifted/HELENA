@@ -50,16 +50,17 @@ try:
 
         Titulo = s_horos.find('h1', attrs={'id': 'titprev'})
         if Titulo:
-            horos_dict['Titulo'] = normalize_text(Titulo.text)
+            titulo_text = Titulo.text.replace('A3', 'ó').replace('A(c)', 'é').replace('A!', 'á').replace("A3n'", 'ó')
+            horos_dict['Titulo'] = normalize_text(titulo_text)
         else:
             horos_dict['Titulo'] = None
 
         Prediccion = s_horos.find('div', attrs={'id': 'resultados'})
         if Prediccion:
-            horos_dict['Prediccion'] = normalize_text(Prediccion.text)
+            prediccion_text = Prediccion.text.replace('A3', 'ó').replace('A(c)', 'é').replace('A!', 'á').replace("A3n'", 'ó')
+            horos_dict['Prediccion'] = normalize_text(prediccion_text)
         else:
             horos_dict['Prediccion'] = None
-        
 
         return horos_dict
 
@@ -122,7 +123,7 @@ data_horos = []
 enlace_final = 'https://www.hola.com/horoscopo/piscis/'
 
 for i, prediccion in enumerate(predicciones):
-    print(f'Scrapeando la nota {i}/{len(predicciones)}')
+    print(f'Scrapeando la predicción {i}/{len(predicciones)}')
     data_horos.append(scrape_prediccion('https://www.hola.com' + prediccion))
 
     # Detener el bucle si se alcanza el enlace final
